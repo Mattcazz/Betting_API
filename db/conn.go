@@ -1,43 +1,65 @@
 package db
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 )
 
-var db *gorm.DB
+var db *sql.DB
 
-func Init() {
+func Connect() error {
 	err := godotenv.Load()
 
 	if err != nil {
-		fmt.Println("Env file sucks!")
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 
 	dbHost := os.Getenv("HOST")
 	dbUser := os.Getenv("USER")
 	dbPassword := os.Getenv("PASSWORD")
 	dbName := os.Getenv("DATABASE")
+	dbPort := os.Getenv("PORT")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbUser, dbPassword, dbName)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName) //postgres://USER:PASSWORD@HOST:PORT/DATABASE?OPTIONS
 
-	db, err = postgres.Open(dsn)
-
+	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		fmt.Println("Not correctly connected")
-	} else {
-		fmt.Println("Connected to the DataBase called", dbName)
+		return err
 	}
+
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(10 * time.Minute) // Every connection that opens is going to close after 10 mins
+
+	// Test connection
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = db.PingContext(ctx); err != nil {
+		return err
+	}
+
+	fmt.Printf("Connected to the %s database successfully!\n", dbName)
+
+	return nil
+
 }
 
 // CloseDB closes the database connection
 func CloseDB() {
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Fatal("Failed to close the database connection:", err)
+	if db != nil {
+		db.Close()
+		fmt.Println("Database closed!!")
 	}
-	sqlDB.Close()
+}
+
+func GetDB() *sql.DB {
+	return db
 }
