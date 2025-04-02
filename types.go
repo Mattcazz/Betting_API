@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
@@ -20,7 +19,6 @@ func NewUser(username, email, password string) *User {
 		return nil
 	}
 	return &User{
-		Id:           rand.Intn(100000), // Using it for now to test it
 		UserName:     username,
 		Email:        email,
 		PasswordHash: passwordHash,
@@ -36,7 +34,6 @@ type Event struct {
 
 func NewEvent(id int, name string, start time.Time, status EventStatus) *Event {
 	return &Event{
-		Id:        rand.Intn(1000000000000000), // Using it for now to test it
 		Name:      name,
 		StartTime: start,
 		Status:    status,
