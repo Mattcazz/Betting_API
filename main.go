@@ -1,16 +1,20 @@
 package main
 
 import (
-	"api/db"
-	"database/sql"
+	"api/config"
 	"fmt"
 )
 
-var DB *sql.DB
-
 func main() {
-	if err := db.Connect(); err != nil {
+	pStore, err := config.NewPostgresStore()
+
+	if err != nil {
 		fmt.Println(err.Error())
 	}
-	defer db.CloseDB()
+
+	defer pStore.CloseDB()
+
+	if err := pStore.Init(); err != nil {
+		fmt.Println(err.Error())
+	}
 }

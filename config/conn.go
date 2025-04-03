@@ -1,4 +1,4 @@
-package db
+package config
 
 import (
 	"context"
@@ -12,9 +12,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var db *sql.DB
+type PostgresStore struct {
+	db *sql.DB
+}
 
-func Connect() error {
+func NewPostgresStore() (*PostgresStore, error) {
 	err := godotenv.Load()
 
 	if err != nil {
@@ -22,7 +24,7 @@ func Connect() error {
 	}
 
 	dbHost := os.Getenv("HOST")
-	dbUser := os.Getenv("USER")
+	dbUser := os.Getenv("PG_USER")
 	dbPassword := os.Getenv("PASSWORD")
 	dbName := os.Getenv("DATABASE")
 	dbPort := os.Getenv("PORT")
@@ -31,7 +33,11 @@ func Connect() error {
 
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Database connection failed: %v", err)
 	}
 
 	db.SetMaxOpenConns(25)
@@ -43,23 +49,36 @@ func Connect() error {
 	defer cancel()
 
 	if err = db.PingContext(ctx); err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Printf("Connected to the %s database successfully!\n", dbName)
 
-	return nil
+	return &PostgresStore{
+		db: db,
+	}, nil
 
+}
+
+func (p *PostgresStore) Init() error {
+	if err := p.CreateEventTable(); err != nil {
+		return err
+	}
+	if err := p.CreateUserTable(); err != nil {
+		return err
+	}
+
+	if err := p.CreateBetTable(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CloseDB closes the database connection
-func CloseDB() {
-	if db != nil {
-		db.Close()
+func (p *PostgresStore) CloseDB() {
+	if p.db != nil {
+		p.db.Close()
 		fmt.Println("Database closed!!")
 	}
-}
-
-func GetDB() *sql.DB {
-	return db
 }
