@@ -1,4 +1,4 @@
-package config
+package store
 
 func (p *PostgresStore) CreateUserTable() error {
 	query := `CREATE TABLE IF NOT EXISTS users (

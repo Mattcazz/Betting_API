@@ -1,29 +1,26 @@
 package main
 
 import (
-	"api/config"
+	"api/server"
+	"api/store"
 	"fmt"
 )
 
-var pStore *config.PostgresStore
-
 func main() {
-
-	var err error
-	pStore, err = config.NewPostgresStore()
+	pgStore, err := store.NewPostgresStore()
 
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	defer pStore.CloseDB()
+	defer pgStore.CloseDB()
 
-	if err := pStore.Init(); err != nil {
+	if err := pgStore.Init(); err != nil {
 		fmt.Println(err.Error())
 	}
 
-	apiServer := NewApiServer()
+	apiServer := server.NewApiServer(pgStore)
 	apiServer.SetUpRoutes()
-	apiServer.engine.Run("localhost:8080")
+	apiServer.Engine.Run("localhost:8080")
 	fmt.Println("Running server on port 8080")
 }
