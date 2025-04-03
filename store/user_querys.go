@@ -55,10 +55,10 @@ func (p *PostgresStore) GetUserById(id int) (*models.User, error) {
 		return scanUserRow(row)
 	}
 
-	return nil, fmt.Errorf("The query came up with no results")
+	return nil, fmt.Errorf("the query came up with no results")
 }
 
-func (p *PostgresStore) DeleteUser(id int) error {
+func (p *PostgresStore) DeleteUserById(id int) error {
 	_, err := p.db.Query("DELETE FROM users WHERE id = $1", id)
 
 	return err

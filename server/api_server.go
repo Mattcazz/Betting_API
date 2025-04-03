@@ -23,6 +23,8 @@ func NewApiServer(store store.Store) *ApiServer {
 
 func (s *ApiServer) SetUpRoutes() {
 	s.SetUpUserRoutes()
+	s.SetupEventRoutes()
+	s.SetupBetRoutes()
 	fmt.Println("Routes are set up correctly")
 }
 
@@ -32,6 +34,28 @@ func (s *ApiServer) SetUpUserRoutes() {
 		userGroup.GET("", s.HandleGetUsers)
 		userGroup.GET("/:id", s.HandleGetUserById)
 		userGroup.POST("", s.HandleCreateUser)
-		userGroup.DELETE("/:id", s.HandleDeleteUser)
+		userGroup.DELETE("/:id", s.HandleDeleteUserById)
+	}
+}
+
+func (s *ApiServer) SetupEventRoutes() {
+	eventGroup := s.Engine.Group("/event")
+	{
+		eventGroup.GET("", s.HandleGetEvents)
+		eventGroup.GET("/:id", s.HandleGetEventById)
+		eventGroup.POST("", s.HandleCreateEvent)
+		eventGroup.DELETE("/:id", s.HandleDeleteEventById)
+
+	}
+}
+
+func (s *ApiServer) SetupBetRoutes() {
+	betGroup := s.Engine.Group("/bet")
+	{
+		betGroup.GET("", s.HandleGetBets)
+		betGroup.GET("/:id", s.HandleGetBetById)
+		betGroup.POST("", s.HandleCreateBet)
+		betGroup.DELETE("", s.HandleDeleteBetById)
+
 	}
 }

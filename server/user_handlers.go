@@ -56,14 +56,14 @@ func (s *ApiServer) HandleCreateUser(c *gin.Context) {
 
 }
 
-func (s *ApiServer) HandleDeleteUser(c *gin.Context) {
+func (s *ApiServer) HandleDeleteUserById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})
 	}
 
-	if err := s.store.DeleteUser(id); err != nil {
+	if err := s.store.DeleteUserById(id); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

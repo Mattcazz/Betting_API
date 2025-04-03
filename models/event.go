@@ -10,7 +10,7 @@ type Event struct {
 	CreatedAt time.Time   `json:"created_at"`
 }
 
-type NewEventRequest struct {
+type CreateEventRequest struct {
 	Name      string      `json:"name"`
 	StartTime time.Time   `json:"start_time"`
 	Status    EventStatus `json:"status"`
