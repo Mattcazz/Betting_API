@@ -3,7 +3,6 @@ package models
 import "time"
 
 type Bet struct {
-	Id       int       `json:"id"` // this is not necessary as the primary key can be the two foreing keys
 	UserId   int       `json:"user_id"`
 	EventId  int       `json:"event_id"`
 	Amount   float32   `json:"amount"`

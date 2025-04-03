@@ -2,21 +2,22 @@ package server
 
 import (
 	"api/models"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (s *ApiServer) HandleGetBetById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+func (s *ApiServer) HandleGetBet(c *gin.Context) {
+	user_id, event_id, err := fetchUserIdEventId("user_id", "event_id", c)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "id not valid. It has to be an int"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	bet, err := s.store.GetBetById(id)
+	bet, err := s.store.GetBet(user_id, event_id)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -34,24 +35,17 @@ func (s *ApiServer) HandleCreateBet(c *gin.Context) {
 		return
 	}
 
-	user_id, err := strconv.Atoi(c.Param("user_id"))
+	user_id, event_id, err := fetchUserIdEventId("user_id", "event_id", c)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id not valid. It has to be an int"})
-		return
-	}
-
-	event_id, err2 := strconv.Atoi(c.Param("event_id"))
-
-	if err2 != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "event_id not valid. It has to be an int"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	bet := models.NewBet(user_id, event_id, newBetReq.Amount, newBetReq.Choice)
 
-	if err3 := s.store.CreateBet(bet); err3 != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err3.Error()})
+	if err := s.store.CreateBet(bet); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -72,18 +66,34 @@ func (s *ApiServer) HandleGetBets(c *gin.Context) {
 
 }
 
-func (s *ApiServer) HandleDeleteBetById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+func (s *ApiServer) HandleDeleteBet(c *gin.Context) {
+	user_id, event_id, err := fetchUserIdEventId("user_id", "event_id", c)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "id not valid. It has to be an int"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := s.store.DeleteBetById(id); err != nil {
+	if err := s.store.DeleteBet(user_id, event_id); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusNoContent, gin.H{"message": "Bet deleted correctly"})
+}
+
+func fetchUserIdEventId(user_id, event_id string, c *gin.Context) (int, int, error) {
+	userId, err := strconv.Atoi(c.Param(user_id))
+
+	if err != nil {
+		return 0, 0, fmt.Errorf("user_id not valid. It has to be an int")
+	}
+
+	eventId, err2 := strconv.Atoi(c.Param(event_id))
+
+	if err2 != nil {
+		return 0, 0, fmt.Errorf("user_id not valid. It has to be an int")
+	}
+
+	return userId, eventId, nil
 }

@@ -30,12 +30,12 @@ func (p *PostgresStore) CreateEventTable() error {
 func (p *PostgresStore) CreateBetTable() error {
 
 	query := `CREATE TABLE IF NOT EXISTS bets (
-		id SERIAL PRIMARY KEY,
 		user_id INT,
 		event_id INT,
 		amount DECIMAL(10,2) NOT NULL,
 		choice VARCHAR(255) NOT NULL,
 		placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY (user_id, event_id),
 		FOREIGN KEY (user_id) REFERENCES users(id),
 		FOREIGN KEY (event_id) REFERENCES events(id)
 	)`

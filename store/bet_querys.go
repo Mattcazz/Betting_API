@@ -37,8 +37,8 @@ func (p *PostgresStore) GetBets() ([]*models.Bet, error) {
 	return bets, err
 }
 
-func (p *PostgresStore) GetBetById(id int) (*models.Bet, error) {
-	row, err := p.db.Query("SELECT * FROM bets WHERE id = $1", id)
+func (p *PostgresStore) GetBet(user_id, event_id int) (*models.Bet, error) {
+	row, err := p.db.Query("SELECT * FROM bets WHERE user_id = $1 AND event_id = $2", user_id, event_id)
 
 	if err != nil {
 		return nil, err
@@ -51,8 +51,8 @@ func (p *PostgresStore) GetBetById(id int) (*models.Bet, error) {
 	return nil, fmt.Errorf("the query came up with no results")
 }
 
-func (p *PostgresStore) DeleteBetById(id int) error {
-	_, err := p.db.Query("DELETE FROM bets WHERE id = $1", id)
+func (p *PostgresStore) DeleteBet(user_id, event_id int) error {
+	_, err := p.db.Query("DELETE FROM bets WHERE user_id = $1 AND event_id = $2", user_id, event_id)
 
 	return err
 }
@@ -62,7 +62,6 @@ func scanBetRow(row *sql.Rows) (*models.Bet, error) {
 	bet := new(models.Bet)
 
 	err := row.Scan(
-		&bet.Id,
 		&bet.UserId,
 		&bet.EventId,
 		&bet.Amount,

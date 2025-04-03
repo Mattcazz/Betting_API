@@ -18,6 +18,6 @@ type Store interface {
 	// Bet funtions
 	CreateBet(bet *models.Bet) error
 	GetBets() ([]*models.Bet, error)
-	GetBetById(id int) (*models.Bet, error)
-	DeleteBetById(id int) error
+	GetBet(user_id, event_id int) (*models.Bet, error)
+	DeleteBet(user_id, event_id int) error
 }

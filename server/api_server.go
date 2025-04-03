@@ -53,8 +53,8 @@ func (s *ApiServer) SetupBetRoutes() {
 	betGroup := s.Engine.Group("/bets")
 	{
 		betGroup.GET("", s.HandleGetBets)
-		betGroup.GET("/:id", s.HandleGetBetById)
-		betGroup.DELETE("/:id", s.HandleDeleteBetById)
+		betGroup.DELETE("/users/:user_id/events/:event_id", s.HandleDeleteBet)
+		betGroup.POST("/users/:user_id/events/:event_id", s.HandleCreateBet)
+		betGroup.GET("/users/:user_id/events/:event_id", s.HandleGetBet)
 	}
-	s.Engine.POST("/users/:user_id/events/:event_id/bets", s.HandleCreateBet)
 }
