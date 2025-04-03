@@ -62,6 +62,7 @@ func scanBetRow(row *sql.Rows) (*models.Bet, error) {
 	bet := new(models.Bet)
 
 	err := row.Scan(
+		&bet.Id,
 		&bet.UserId,
 		&bet.EventId,
 		&bet.Amount,

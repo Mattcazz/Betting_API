@@ -67,5 +67,5 @@ func (s *ApiServer) HandleDeleteEventById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{"approved": "The event got deleted correctly"})
+	c.JSON(http.StatusNoContent, gin.H{"message": "The event got deleted correctly"})
 }

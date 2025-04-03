@@ -29,7 +29,7 @@ func (s *ApiServer) SetUpRoutes() {
 }
 
 func (s *ApiServer) SetUpUserRoutes() {
-	userGroup := s.Engine.Group("/user")
+	userGroup := s.Engine.Group("/users")
 	{
 		userGroup.GET("", s.HandleGetUsers)
 		userGroup.GET("/:id", s.HandleGetUserById)
@@ -39,7 +39,7 @@ func (s *ApiServer) SetUpUserRoutes() {
 }
 
 func (s *ApiServer) SetupEventRoutes() {
-	eventGroup := s.Engine.Group("/event")
+	eventGroup := s.Engine.Group("/events")
 	{
 		eventGroup.GET("", s.HandleGetEvents)
 		eventGroup.GET("/:id", s.HandleGetEventById)
@@ -50,12 +50,11 @@ func (s *ApiServer) SetupEventRoutes() {
 }
 
 func (s *ApiServer) SetupBetRoutes() {
-	betGroup := s.Engine.Group("/bet")
+	betGroup := s.Engine.Group("/bets")
 	{
 		betGroup.GET("", s.HandleGetBets)
 		betGroup.GET("/:id", s.HandleGetBetById)
-		betGroup.POST("", s.HandleCreateBet)
-		betGroup.DELETE("", s.HandleDeleteBetById)
-
+		betGroup.DELETE("/:id", s.HandleDeleteBetById)
 	}
+	s.Engine.POST("/users/:user_id/events/:event_id/bets", s.HandleCreateBet)
 }
