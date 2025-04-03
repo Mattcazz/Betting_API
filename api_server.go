@@ -27,6 +27,8 @@ func (s *ApiServer) SetUpUserRoutes() {
 	userGroup := s.engine.Group("/user")
 	{
 		userGroup.GET("", HandleGetUsers)
+		userGroup.GET("/:id", HandleGetUserById)
 		userGroup.POST("", HandleCreateUser)
+
 	}
 }
