@@ -1,9 +1,9 @@
 package types
 
 import (
+	"api/utils"
 	"fmt"
 	"time"
-	"api/utils"
 )
 
 type User struct {
@@ -24,11 +24,11 @@ func NewUser(username, email, password string) *User {
 		UserName:     username,
 		Email:        email,
 		PasswordHash: passwordHash,
-		CreatedAt:    time.Now(),
+		CreatedAt:    time.Now().UTC(),
 	}
 }
 
-type UserRequest struct {
+type CreateUserRequest struct {
 	UserName string `json:"user_name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`

@@ -29,7 +29,7 @@ func (p *PostgresStore) CreateEventTable() error {
 
 func (p *PostgresStore) CreateBetTable() error {
 
-	query := `CREATE TABLE bets (
+	query := `CREATE TABLE IF NOT EXISTS bets (
 		id SERIAL PRIMARY KEY,
 		user_id INT,
 		event_id INT,
