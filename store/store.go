@@ -1,10 +1,10 @@
 package store
 
-import "api/types"
+import "api/models"
 
 type Store interface {
-	CreateUser(user *types.User) error
-	GetUsers() ([]*types.User, error)
-	GetUserById(id int) (*types.User, error)
+	CreateUser(user *models.User) error
+	GetUsers() ([]*models.User, error)
+	GetUserById(id int) (*models.User, error)
 	DeleteUser(id int) error
 }

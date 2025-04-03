@@ -1,12 +1,12 @@
 package store
 
 import (
-	"api/types"
+	"api/models"
 	"database/sql"
 	"fmt"
 )
 
-func (p *PostgresStore) CreateUser(user *types.User) error {
+func (p *PostgresStore) CreateUser(user *models.User) error {
 	query := `INSERT INTO users 
 			(user_name, email, passwordhash, created_at)
 			VALUES ($1, $2, $3, $4)`
@@ -20,14 +20,14 @@ func (p *PostgresStore) CreateUser(user *types.User) error {
 	return err
 }
 
-func (p *PostgresStore) GetUsers() ([]*types.User, error) {
+func (p *PostgresStore) GetUsers() ([]*models.User, error) {
 	rows, err := p.db.Query("SELECT * FROM users")
 
 	if err != nil {
 		return nil, err
 	}
 
-	users := []*types.User{}
+	users := []*models.User{}
 
 	for rows.Next() {
 
@@ -42,7 +42,7 @@ func (p *PostgresStore) GetUsers() ([]*types.User, error) {
 	return users, nil
 }
 
-func (p *PostgresStore) GetUserById(id int) (*types.User, error) {
+func (p *PostgresStore) GetUserById(id int) (*models.User, error) {
 	query := `SELECT * FROM USERS WHERE id = $1`
 
 	row, err := p.db.Query(query, id)
@@ -65,8 +65,8 @@ func (p *PostgresStore) DeleteUser(id int) error {
 }
 
 // Private function that returns a user given a row to scan
-func scanUserRow(row *sql.Rows) (*types.User, error) {
-	user := new(types.User)
+func scanUserRow(row *sql.Rows) (*models.User, error) {
+	user := new(models.User)
 
 	err := row.Scan(
 		&user.Id,

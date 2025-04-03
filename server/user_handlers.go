@@ -1,7 +1,7 @@
 package server
 
 import (
-	"api/types"
+	"api/models"
 	"net/http"
 	"strconv"
 
@@ -38,14 +38,14 @@ func (s *ApiServer) HandleGetUserById(c *gin.Context) {
 
 func (s *ApiServer) HandleCreateUser(c *gin.Context) {
 
-	var newUserReq types.CreateUserRequest
+	var newUserReq models.CreateUserRequest
 
 	if err := c.BindJSON(&newUserReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request. You need to pass a user_name, email and a password only"})
 		return
 	}
 
-	newUser := types.NewUser(newUserReq.UserName, newUserReq.Email, newUserReq.Password)
+	newUser := models.NewUser(newUserReq.UserName, newUserReq.Email, newUserReq.Password)
 
 	if err := s.store.CreateUser(newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
