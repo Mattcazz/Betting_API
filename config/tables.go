@@ -5,7 +5,8 @@ func (p *PostgresStore) CreateUserTable() error {
 		id serial PRIMARY KEY,
 		user_name VARCHAR(50) NOT NULL, 
 		email VARCHAR(50) NOT NULL UNIQUE, 
-		PasswordHash TEXT NOT NULL
+		PasswordHash TEXT NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`
 
 	_, err := p.db.Exec(query)
@@ -18,7 +19,8 @@ func (p *PostgresStore) CreateEventTable() error {
 		id SERIAL PRIMARY KEY,
     	name VARCHAR(255) NOT NULL,
     	start_time TIMESTAMP NOT NULL,
-    	status VARCHAR(50) CHECK (status IN ('upcoming', 'ongoing', 'completed')) NOT NULL
+    	status VARCHAR(50) CHECK (status IN ('upcoming', 'ongoing', 'completed')) NOT NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`
 
 	_, err := p.db.Exec(query)
