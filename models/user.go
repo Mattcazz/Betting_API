@@ -28,7 +28,7 @@ func NewUser(username, email, password string) *User {
 	}
 }
 
-func ValidatePassword(password string, user *User) bool {
+func (user *User) ValidatePassword(password string) bool {
 	return utils.CheckPasswordHash(password, user.PasswordHash)
 }
 

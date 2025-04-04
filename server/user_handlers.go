@@ -20,11 +20,11 @@ func (s *ApiServer) HandleLogin(c *gin.Context) {
 	user, err := s.store.GetUserByEmail(loginReq.Email)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid email address"})
 		return
 	}
 
-	if !models.ValidatePassword(loginReq.Password, user) {
+	if !user.ValidatePassword(loginReq.Password) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid password"})
 		return
 	}

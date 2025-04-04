@@ -23,8 +23,15 @@ func JWTAuth(handlerFunc gin.HandlerFunc, s store.Store) gin.HandlerFunc {
 			return
 		}
 
-		if !token.Valid {
+		claims := token.Claims.(jwt.MapClaims)
+
+		if !token.Valid || claims["expires_at"] == nil || claims["user_id"] == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid token"})
+			return
+		}
+
+		if time.Now().Unix() > int64(claims["expires_at"].(float64)) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "token expired"})
 			return
 		}
 
@@ -34,8 +41,6 @@ func JWTAuth(handlerFunc gin.HandlerFunc, s store.Store) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})
 			return
 		}
-
-		claims := token.Claims.(jwt.MapClaims)
 
 		if id != int(claims["user_id"].(float64)) {
 
@@ -51,8 +56,8 @@ func JWTAuth(handlerFunc gin.HandlerFunc, s store.Store) gin.HandlerFunc {
 func CreateJWTtoken(user *models.User) (string, error) {
 
 	claims := jwt.MapClaims{
-		"expiresAt": time.Now().Add(time.Hour * 1).Unix(),
-		"user_id":   user.Id,
+		"expires_at": time.Now().Add(time.Hour * 1).Unix(),
+		"user_id":    user.Id,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
