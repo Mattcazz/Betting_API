@@ -1,12 +1,49 @@
 package server
 
 import (
+	"api/middleware"
 	"api/models"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (s *ApiServer) HandleLogin(c *gin.Context) {
+	var loginReq models.LoginRequest
+
+	if err := c.BindJSON(&loginReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := s.store.GetUserByEmail(loginReq.Email)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !models.ValidatePassword(loginReq.Password, user) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid password"})
+		return
+	}
+
+	token, err2 := middleware.CreateJWTtoken(user)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
+		return
+	}
+
+	loginResponse := &models.LoginResponse{
+		UserId: user.Id,
+		Token:  token,
+	}
+
+	c.IndentedJSON(http.StatusAccepted, loginResponse)
+
+}
 
 func (s *ApiServer) HandleGetUsers(c *gin.Context) {
 	users, err := s.store.GetUsers()

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"api/middleware"
 	"api/store"
 	"fmt"
 
@@ -32,10 +33,11 @@ func (s *ApiServer) SetUpUserRoutes() {
 	userGroup := s.Engine.Group("/users")
 	{
 		userGroup.GET("", s.HandleGetUsers)
-		userGroup.GET("/:id", s.HandleGetUserById)
+		userGroup.GET("/:id", middleware.JWTAuth(s.HandleGetUserById, s.store))
 		userGroup.POST("", s.HandleCreateUser)
-		userGroup.DELETE("/:id", s.HandleDeleteUserById)
+		userGroup.DELETE("/:id", middleware.JWTAuth(s.HandleDeleteUserById, s.store))
 	}
+	s.Engine.POST("/login", s.HandleLogin)
 }
 
 func (s *ApiServer) SetupEventRoutes() {
@@ -45,7 +47,6 @@ func (s *ApiServer) SetupEventRoutes() {
 		eventGroup.GET("/:id", s.HandleGetEventById)
 		eventGroup.POST("", s.HandleCreateEvent)
 		eventGroup.DELETE("/:id", s.HandleDeleteEventById)
-
 	}
 }
 

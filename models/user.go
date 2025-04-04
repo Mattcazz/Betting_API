@@ -28,8 +28,22 @@ func NewUser(username, email, password string) *User {
 	}
 }
 
+func ValidatePassword(password string, user *User) bool {
+	return utils.CheckPasswordHash(password, user.PasswordHash)
+}
+
 type CreateUserRequest struct {
 	UserName string `json:"user_name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	UserId int    `json:"user_id"`
+	Token  string `json:"token"`
 }

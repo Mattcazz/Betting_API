@@ -8,6 +8,7 @@ type Store interface {
 	GetUsers() ([]*models.User, error)
 	GetUserById(id int) (*models.User, error)
 	DeleteUserById(id int) error
+	GetUserByEmail(email string) (*models.User, error)
 
 	// Event functions
 	CreateEvent(event *models.Event) error
