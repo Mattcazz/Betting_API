@@ -45,6 +45,23 @@ func (s *ApiServer) HandleLogin(c *gin.Context) {
 
 }
 
+func (s *ApiServer) HandleGetUserBets(c *gin.Context) {
+	id, err := getId(c)
+
+	if err {
+		return
+	}
+
+	bets, err2 := s.store.GetUserBets(id)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, bets)
+}
+
 func (s *ApiServer) HandleGetUsers(c *gin.Context) {
 	users, err := s.store.GetUsers()
 
@@ -57,20 +74,26 @@ func (s *ApiServer) HandleGetUsers(c *gin.Context) {
 }
 
 func (s *ApiServer) HandleGetUserById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := getId(c)
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})
-	}
-
-	user, err := s.store.GetUserById(id)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, user)
+	user, err2 := s.store.GetUserById(id)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
+		return
+	}
+
+	userResponse := &models.UserResponse{
+		Id:       user.Id,
+		UserName: user.UserName,
+		Email:    user.Email,
+	}
+
+	c.IndentedJSON(http.StatusOK, userResponse)
 }
 
 func (s *ApiServer) HandleCreateUser(c *gin.Context) {
@@ -94,10 +117,10 @@ func (s *ApiServer) HandleCreateUser(c *gin.Context) {
 }
 
 func (s *ApiServer) HandleDeleteUserById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	id, err := getId(c)
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})
+	if err {
+		return
 	}
 
 	if err := s.store.DeleteUserById(id); err != nil {
@@ -105,6 +128,17 @@ func (s *ApiServer) HandleDeleteUserById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{"approved": "The user got deleted correctly"})
+	c.JSON(http.StatusNoContent, gin.H{"message": "The user got deleted correctly"})
 
+}
+
+func getId(c *gin.Context) (int, bool) {
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})
+		return 0, true
+	}
+
+	return id, false
 }

@@ -21,8 +21,9 @@ func NewUser(username, email, password string) *User {
 		return nil
 	}
 	return &User{
-		UserName:     username,
-		Email:        email,
+		UserName: username,
+		Email:    email,
+
 		PasswordHash: passwordHash,
 		CreatedAt:    time.Now().UTC(),
 	}
@@ -46,4 +47,10 @@ type LoginRequest struct {
 type LoginResponse struct {
 	UserId int    `json:"user_id"`
 	Token  string `json:"token"`
+}
+
+type UserResponse struct {
+	Id       int    `json:"id"`
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
 }

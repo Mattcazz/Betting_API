@@ -34,10 +34,12 @@ func (s *ApiServer) SetUpUserRoutes() {
 	{
 		userGroup.GET("", s.HandleGetUsers)
 		userGroup.GET("/:id", middleware.JWTAuth(s.HandleGetUserById, s.store))
+		userGroup.GET("/:id/bets", middleware.JWTAuth(s.HandleGetUserBets, s.store))
 		userGroup.POST("", s.HandleCreateUser)
 		userGroup.DELETE("/:id", middleware.JWTAuth(s.HandleDeleteUserById, s.store))
 	}
 	s.Engine.POST("/login", s.HandleLogin)
+
 }
 
 func (s *ApiServer) SetupEventRoutes() {

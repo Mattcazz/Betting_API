@@ -9,6 +9,7 @@ type Store interface {
 	GetUserById(id int) (*models.User, error)
 	DeleteUserById(id int) error
 	GetUserByEmail(email string) (*models.User, error)
+	GetUserBets(id int) ([]*models.Bet, error)
 
 	// Event functions
 	CreateEvent(event *models.Event) error

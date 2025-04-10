@@ -42,6 +42,29 @@ func (p *PostgresStore) GetUsers() ([]*models.User, error) {
 	return users, nil
 }
 
+func (p *PostgresStore) GetUserBets(id int) ([]*models.Bet, error) {
+	rows, err := p.db.Query(`SELECT * FROM BETS WHERE user_id = $1`, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	bets := []*models.Bet{}
+
+	for rows.Next() {
+
+		bet, err := scanBetRow(rows)
+
+		if err != nil {
+			return nil, err
+		}
+		bets = append(bets, bet)
+	}
+
+	return bets, nil
+
+}
+
 func (p *PostgresStore) GetUserById(id int) (*models.User, error) {
 	query := `SELECT * FROM USERS WHERE id = $1`
 
