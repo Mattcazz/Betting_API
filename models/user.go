@@ -49,7 +49,7 @@ type LoginResponse struct {
 	Token  string `json:"token"`
 }
 
-type UserResponse struct {
+type UserDTO struct {
 	Id       int    `json:"id"`
 	UserName string `json:"user_name"`
 	Email    string `json:"email"`

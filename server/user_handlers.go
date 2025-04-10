@@ -46,7 +46,7 @@ func (s *ApiServer) HandleLogin(c *gin.Context) {
 }
 
 func (s *ApiServer) HandleGetUserBets(c *gin.Context) {
-	id, err := getId(c)
+	id, err := getId(c, "user_id")
 
 	if err {
 		return
@@ -62,6 +62,49 @@ func (s *ApiServer) HandleGetUserBets(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, bets)
 }
 
+func (s *ApiServer) HandlePostBetByUser(c *gin.Context) {
+
+	user_id, err := getId(c, "user_id")
+	event_id, err2 := getId(c, "event_id")
+
+	if err || err2 {
+		return
+	}
+
+	var betReq models.CreateBetRequest
+
+	if err3 := c.BindJSON(&betReq); err3 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err3.Error()})
+		return
+	}
+
+	bet := models.NewBet(user_id, event_id, betReq.Amount, betReq.Choice)
+
+	if err4 := s.store.CreateBet(bet); err4 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err4.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, bet)
+}
+
+func (s *ApiServer) HandleDeleteBetByUser(c *gin.Context) {
+	user_id, err := getId(c, "user_id")
+	event_id, err2 := getId(c, "event_id")
+
+	if err || err2 {
+		return
+	}
+
+	if err := s.store.DeleteBet(user_id, event_id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Bet deleted correctly"})
+
+}
+
 func (s *ApiServer) HandleGetUsers(c *gin.Context) {
 	users, err := s.store.GetUsers()
 
@@ -74,7 +117,7 @@ func (s *ApiServer) HandleGetUsers(c *gin.Context) {
 }
 
 func (s *ApiServer) HandleGetUserById(c *gin.Context) {
-	id, err := getId(c)
+	id, err := getId(c, "user_id")
 
 	if err {
 		return
@@ -87,7 +130,7 @@ func (s *ApiServer) HandleGetUserById(c *gin.Context) {
 		return
 	}
 
-	userResponse := &models.UserResponse{
+	userResponse := &models.UserDTO{
 		Id:       user.Id,
 		UserName: user.UserName,
 		Email:    user.Email,
@@ -117,7 +160,7 @@ func (s *ApiServer) HandleCreateUser(c *gin.Context) {
 }
 
 func (s *ApiServer) HandleDeleteUserById(c *gin.Context) {
-	id, err := getId(c)
+	id, err := getId(c, "user_id")
 
 	if err {
 		return
@@ -132,8 +175,9 @@ func (s *ApiServer) HandleDeleteUserById(c *gin.Context) {
 
 }
 
-func getId(c *gin.Context) (int, bool) {
-	id, err := strconv.Atoi(c.Param("id"))
+func getId(c *gin.Context, id_string string) (int, bool) {
+
+	id, err := strconv.Atoi(c.Param(id_string))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})

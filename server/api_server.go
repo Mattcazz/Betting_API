@@ -23,6 +23,7 @@ func NewApiServer(store store.Store) *ApiServer {
 }
 
 func (s *ApiServer) SetUpRoutes() {
+	s.Engine.POST("/login", s.HandleLogin)
 	s.SetUpUserRoutes()
 	s.SetupEventRoutes()
 	s.SetupBetRoutes()
@@ -33,13 +34,13 @@ func (s *ApiServer) SetUpUserRoutes() {
 	userGroup := s.Engine.Group("/users")
 	{
 		userGroup.GET("", s.HandleGetUsers)
-		userGroup.GET("/:id", middleware.JWTAuth(s.HandleGetUserById, s.store))
-		userGroup.GET("/:id/bets", middleware.JWTAuth(s.HandleGetUserBets, s.store))
+		userGroup.GET("/:user_id", middleware.JWTAuth(s.HandleGetUserById, s.store))
+		userGroup.GET("/:user_id/bets", middleware.JWTAuth(s.HandleGetUserBets, s.store))
 		userGroup.POST("", s.HandleCreateUser)
-		userGroup.DELETE("/:id", middleware.JWTAuth(s.HandleDeleteUserById, s.store))
+		userGroup.POST("/:user_id/events/:event_id/bet", middleware.JWTAuth(s.HandlePostBetByUser, s.store))
+		userGroup.DELETE("/:user_id/events/:event_id/bet", middleware.JWTAuth(s.HandleDeleteBetByUser, s.store))
+		userGroup.DELETE("/:user_id", middleware.JWTAuth(s.HandleDeleteUserById, s.store))
 	}
-	s.Engine.POST("/login", s.HandleLogin)
-
 }
 
 func (s *ApiServer) SetupEventRoutes() {
@@ -56,8 +57,5 @@ func (s *ApiServer) SetupBetRoutes() {
 	betGroup := s.Engine.Group("/bets")
 	{
 		betGroup.GET("", s.HandleGetBets)
-		betGroup.DELETE("/users/:user_id/events/:event_id", s.HandleDeleteBet)
-		betGroup.POST("/users/:user_id/events/:event_id", s.HandleCreateBet)
-		betGroup.GET("/users/:user_id/events/:event_id", s.HandleGetBet)
 	}
 }

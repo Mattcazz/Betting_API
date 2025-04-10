@@ -35,7 +35,7 @@ func JWTAuth(handlerFunc gin.HandlerFunc, s store.Store) gin.HandlerFunc {
 			return
 		}
 
-		id, err := strconv.Atoi(c.Param("id"))
+		id, err := strconv.Atoi(c.Param("user_id"))
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Id needs to be an int"})
